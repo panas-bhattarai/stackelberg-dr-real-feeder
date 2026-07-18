@@ -73,3 +73,76 @@ README or notebooks traces to an entry here.
 Every numerical claim in the notebooks is produced by executed cells committed
 with their outputs; anchors digitized from the paper's figures are labeled as
 such (±few % reading error). No result is quoted from the paper as ours.
+
+## M2 — The game meets the feeder (SimBench 1-MV-rural--0-sw)
+
+### Scope decisions and assumptions
+- **[M2-A1]** Feeder: SimBench `1-MV-rural--0-sw` (97 buses, 96 loads, 17.256 MW
+  nameplate, 116 km, 2×25 MVA). Rural chosen deliberately: long weak feeders ⇒
+  voltage-constrained (verified: thermal never binds below γ≈1.7). Voltage limit
+  0.965 pu (SimBench MV planning band, net.bus.min_vm_pu); thermal 100%.
+- **[M2-A2]** Mapping: one household per SimBench load; budget C_n = nameplate
+  p_mw (equal wealth per kW); q at nameplate Q/P; K=3 UCs at the substation,
+  supply split 10:15:20 (M1's proportions), total ΣP = γ·17.256 MW. γ is the
+  single experimental knob; sell-all makes total equilibrium demand ≡ γ·17.256.
+- **[M2-A3]** DER (sgen) switched off — M2 is a load-only story.
+- **[M2-A4]** β_n = 0.001 MW (must be ≪ household demand ~0.2 MW; M1's β=1
+  would distort the utility shape at feeder scale).
+- **[M2-A5]** "DLMP-lite": per-bus voltage shadow prices + one global thermal
+  multiplier, tuned by projected dual ascent against AC-PF audits, resolved to
+  households by finite-difference sensitivities (dp=0.05 MW, refreshed every 5
+  outer iterations). NOT duals of an AC-OPF: no loss term, no optimality
+  guarantee. Multiplier update targets VMIN+0.0005 pu so the subgradient step
+  does not vanish as the gap closes (feasibility judged against VMIN itself).
+- **[M2-A6]** Single trading period, deterministic; no storage, no DER, no
+  inter-temporal coupling.
+- **[M2-A7]** Feasibility tolerances: voltage 2e-4 pu (0.02%), loading 0.1%.
+  Adopted after observing the dual ascent hover within ~1e-4 pu of the exact
+  limit indefinitely (an exactness artifact, not physics — 0.02% is far below
+  any real feeder's measurement accuracy). Inner market-clearing budget raised
+  2000 -> 4000 iterations for the same reason (extreme adders slow Algorithm 2
+  near the frontier).
+
+### Results (all AC-PF audited; see notebook 03)
+- **[M2-R1]** M1 machinery transplants unchanged to N=96: closed-form
+  equilibrium ≡ Algorithm-2 clearing to ~1e-5.
+- **[M2-R2]** Copperplate feasibility boundary γ* = 0.90 (grid step 0.05:
+  min_vm 0.9655 at γ=0.90, 0.9615 at γ=0.95). Voltage binds first; thermal only
+  ~81% even at γ=1.4. Voltage falls with electrical distance |Z| (1.9–14.7 Ω)
+  — but branch-wise, not monotonically (see M2-R4).
+- **[M2-R3]** Trajectory infeasibility: at γ=0.9 (equilibrium feasible), price
+  discovery from y0=0.6·y* violates the voltage limit for 43 of 300 iterations,
+  worst min_vm 0.9155 pu at iteration 0. Steady-state feasibility ≠ trajectory
+  feasibility. (The run shows excess-demand tolerance 1e-8 not yet reached at
+  iteration 300 — residual is physically immaterial; the trajectory is settled.)
+- **[M2-R4]** Per-bus dual ascent restores feasibility at γ=1.1 in ~18 outer
+  iterations (13 active bus constraints); total sold unchanged (19.0 MW) — the
+  repricing relocates demand, it does not ration it. **τ is NOT a distance
+  tariff:** the violating branch (7–11 Ω) pays up to ~0.5 while farther buses on
+  healthy branches (13–15 Ω) pay ~0.03 — DLMP prices constraint responsibility,
+  not remoteness. Fig. 15b.
+- **[M2-R5]** Feasibility frontier (warm-started continuation, grid step 0.1):
+  repriced market feasible through γ** = 1.7 (29.3 MW = +89% hosting capacity
+  over γ*·17.256 = 15.5 MW). At γ=1.8 the ascent fails for solver reasons (the
+  inner Algorithm-2 clearing stops converging under extreme adders; the final
+  iterate's physics is within limits) — γ** is a lower bound (M2-D3). Thermal
+  loading 87.5% at γ=1.7 and climbing: relocation cannot reduce total current,
+  so the true frontier is a thermal wall.
+- **[M2-R6]** Fairness cost (M4 hook): under repricing at γ=1.1, one budget-unit
+  buys 1.121 MW-units in the farthest distance quartile vs 1.200 nearest — the
+  same money buys ~7% less energy at the feeder end (distance is a proxy; the
+  surcharge actually lands on the congested branch). Notebook §7.
+
+### Deviations / negative findings
+- **[M2-D1]** **A single global-min-voltage constraint whack-a-moles between
+  feeder branches** and never converges: suppressing branch A's end makes
+  branch B's end the new argmin; the sensitivity vector flips wholesale on each
+  refresh and the market equilibrium jumps (observed stall at 0.9637 with
+  5-iteration crash cycles). Fix: one multiplier per load bus (the shape a real
+  OPF dual has anyway). Kept in the notebook as a told negative result.
+- **[M2-D2]** With constant-step subgradient, min_vm approached 0.965
+  asymptotically (0.9648 after 120 iterations) — vanishing-gradient stall;
+  fixed by the +0.0005 pu update margin (M2-A5).
+- **[M2-D3]** γ** is a lower bound on the true repriced hosting capacity: the
+  ascent is declared failed on multiplier blow-up or iteration exhaustion,
+  either of which may be conservative.

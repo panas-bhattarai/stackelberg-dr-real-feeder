@@ -5,3 +5,6 @@ matplotlib>=3.8
 jupyter
 nbformat>=5.9
 nbconvert>=7.0
+pandapower>=3.0
+simbench>=1.6
+networkx>=3.0
