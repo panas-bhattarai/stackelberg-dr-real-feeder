@@ -1,0 +1,6 @@
+# paper PDF and derived artifacts — not redistributed (copyright)
+references/
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
