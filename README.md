@@ -1,6 +1,6 @@
 # stackelberg-dr-real-feeder
 
-**Status: work in progress — Milestones 1–2 of 4 complete.**
+**Status: work in progress — Milestones 1–3 of 4 complete.**
 
 **What happens to game-theoretic demand response when the copperplate becomes a
 real feeder?** Game-theoretic DR is almost always studied on a copperplate model —
@@ -15,8 +15,34 @@ distribution-feeder physics, learning agents, and fairness metrics.
 |---|---|---|
 | **M1** | Recreate the Stackelberg DR game of Maharjan *et al.* (2013): unique equilibrium, closed forms, distributed local-information algorithm | ✅ done |
 | **M2** | Pin the households to buses of a SimBench MV feeder; audit every equilibrium with AC power flow; reprice with network-aware (DLMP-style) prices | ✅ done |
-| **M3** | Replace clairvoyant best responses with learning agents on private data only — is the equilibrium still reachable? | ⏳ next |
-| **M4** | Measure location-(un)fairness of efficient network pricing; test Shapley-based cost allocation as repair and as bill explanation | planned |
+| **M3** | Replace clairvoyant best responses with learning agents on private data only — is the equilibrium still reachable? | ✅ done |
+| **M4** | Measure location-(un)fairness of efficient network pricing; test Shapley-based cost allocation as repair and as bill explanation | ⏳ next |
+
+## M3 — learning the equilibrium
+
+The clairvoyant eq.-(21) households are replaced by **model-free bandit
+learners** — each observes only posted prices, its own budget, and its own
+realized comfort (a number, not a formula), and learns by perturb-and-observe
+(the MPPT logic, as a market strategy). Leaders keep the paper's Algorithm-2
+integral control on a slower timescale. Findings, multi-seed and AC-PF audited:
+
+- **The equilibrium is learnable from comfort feedback alone:** 96 learners +
+  3 adaptive leaders converge to the exact Stackelberg equilibrium (median 1.8%
+  price error, 3.3 kW/household demand error over 6 seeds) — but ~100× slower
+  than clairvoyant dynamics, and to a stochastic neighborhood, never a point.
+- **The two nested loops must respect cascade-control rules:** sluggish leaders
+  never arrive, eager leaders chase exploration noise and amplify it (~8×
+  price jitter) — who updates when is a design variable, measured.
+- **Learning flicker spends the equilibrium's safety margin:** at γ=0.9 the
+  exact equilibrium keeps 0.5 milli-pu of voltage headroom; the learning
+  trajectory violates the limit on 120 of 400 audited rounds (worst 0.83 pu)
+  and keeps flickering across it after "converging." Equilibrium analysis
+  certifies a point; learning occupies a neighborhood.
+- **DLMP-lite prices steer learners correctly but leave zero margin:** under
+  the frozen network-aware adders the learners find the repriced equilibrium,
+  yet cross the voltage limit on 311 of 400 audited rounds — maximal static
+  efficiency and robustness-to-learning are in direct tension (named as the
+  open thesis-grade question).
 
 ## M2 — the game meets the feeder
 
@@ -74,6 +100,7 @@ parameters (their converged demands are inconsistent with total supply); Figs.
 | [`01_from_dispatch_to_games`](notebooks/01_from_dispatch_to_games.ipynb) | Game theory from scratch for a power engineer: Nash via a 2-EV/1-transformer game, best-response dynamics as Gauss–Seidel, price of anarchy, a congestion toll that makes selfishness optimal, Stackelberg leadership, and why best-response dynamics can hunt or diverge |
 | [`02_maharjan2013_recreation`](notebooks/02_maharjan2013_recreation.ipynb) | The faithful recreation: model extraction, verification, reproduction of the paper's figures, the distributed algorithm as an integral controller on excess demand, and the recreation scorecard |
 | [`03_the_game_meets_the_feeder`](notebooks/03_the_game_meets_the_feeder.ipynb) | M2: the same game on a real feeder — AC-PF audits of equilibria and transients, the DLMP-lite dual ascent (with its instructive failures), the hosting-capacity frontier, and the fairness teaser |
+| [`04_learning_the_equilibrium`](notebooks/04_learning_the_equilibrium.ipynb) | M3: model-free households — bandit learning to the exact SE, the cascade-tuning landscape, and the trajectory audits showing learning noise spend the voltage margin |
 
 [`docs/model_extraction.md`](docs/model_extraction.md) holds the full equation
 extraction with notation mapped to power-engineering terms;

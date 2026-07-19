@@ -146,3 +146,54 @@ such (±few % reading error). No result is quoted from the paper as ours.
 - **[M2-D3]** γ** is a lower bound on the true repriced hosting capacity: the
   ascent is declared failed on multiplier blow-up or iteration exhaustion,
   either of which may be conservative.
+
+## M3 — Learning the equilibrium (notebook 04)
+
+### Scope decisions and assumptions
+- **[M3-A1]** Learner: two-point bandit gradient ascent (SPSA-flavored) with
+  Euclidean projection onto the household's own budget set; schedules
+  η_t ∝ 1/√t, δ_t ∝ t^(-1/4); per-household scales η0 = 0.15·C_n,
+  δ0 = 0.05·C_n. Deliberately NOT deep RL: the question (does decentralized
+  selfish learning find the game's equilibrium?) is cleanest with the simplest
+  model-free learner with convex-case guarantees.
+- **[M3-A2]** Both probe points of a round are evaluated at unchanged prices
+  (two half-periods of one trading round). The "played" demand of a round is
+  the mean of the two probes.
+- **[M3-A3]** Leaders: unchanged Algorithm-2 integral control, one UC update
+  per T_uc rounds (round-robin), driven by the MEAN demand metered over the
+  period — realistic (energy metering) and smooths exploration noise.
+- **[M3-A4]** Information diet: households observe posted prices, own budget,
+  own realized comfort (a number). They never see α_n, β_n, the log form,
+  other players, supplies, or any equilibrium quantity. Error metrics use the
+  known equilibria (R1 exact / M2 dual-ascent) — agents never do.
+- **[M3-A5]** In §6 the congestion adders are FROZEN at the dual-ascent τ* —
+  no adaptive repricing against learners. Adaptive-DLMP-vs-learners is named
+  as an open question, not attempted.
+- **[M3-A6]** Rounds are independent (no inter-round load coupling, storage,
+  or weather); single feeder; γ=0.9 (copperplate experiments) and γ=1.1
+  (network-priced experiment).
+
+### Results (executed notebook 04)
+- **[M3-R1]** Single learner vs fixed prices recovers the eq.-(21) best
+  response to 2.7% in 3000 rounds (~t^(-1/2) error decay), never having seen
+  the formula. §2.
+- **[M3-R2]** Coupled system (96 learners + 3 adaptive leaders, 6 seeds,
+  8000 rounds) converges to the exact SE: median price error 1.8%, median
+  demand error 3.3 kW/household (equilibrium mean 162 kW) — ~100× slower than
+  clairvoyant R2 (thousands of rounds vs ~10²). Error floors (stochastic
+  steady state); equilibrium is an attractor, not a destination. §3.
+- **[M3-R3]** Two-loop tuning is two-sided (final-error × tail-jitter):
+  T_uc=50 too sluggish (err 0.17); (T_uc=1, σ=5) chases exploration noise
+  (jitter 0.029, ~8× the quiet configs); working region T_uc≈10 with σ 10–40
+  (lowest jitter 0.0035 at (10,40); lowest error 0.038 at (10,10)). §4.
+- **[M3-R4]** Trajectory audits at γ=0.9: learning trajectory violates the
+  voltage limit on 120 of 400 audited rounds, worst 0.8295 pu (deep collective
+  exploration early; flicker across the 0.5 milli-pu margin late), vs 47/400
+  for the R2 baseline from the same starting prices — and R2's violations end,
+  the learners' recur. Equilibrium analysis certifies a point; learning
+  occupies a neighborhood. §5.
+- **[M3-R5]** Frozen DLMP-lite adders steer learners to the repriced
+  equilibrium at γ=1.1 (price error → 1.5%) — but that equilibrium rides the
+  limit by construction, so learning noise crosses it on 311 of 400 audited
+  rounds (worst 0.8748): static efficiency leaves zero margin for learning.
+  Efficiency vs robustness-to-learning named as the open tension. §6.
