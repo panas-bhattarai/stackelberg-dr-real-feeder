@@ -1,6 +1,6 @@
 # stackelberg-dr-real-feeder
 
-**Status: work in progress — Milestones 1–3 of 4 complete.**
+**Status: all four milestones complete.**
 
 **What happens to game-theoretic demand response when the copperplate becomes a
 real feeder?** Game-theoretic DR is almost always studied on a copperplate model —
@@ -16,7 +16,7 @@ distribution-feeder physics, learning agents, and fairness metrics.
 | **M1** | Recreate the Stackelberg DR game of Maharjan *et al.* (2013): unique equilibrium, closed forms, distributed local-information algorithm | ✅ done |
 | **M2** | Pin the households to buses of a SimBench MV feeder; audit every equilibrium with AC power flow; reprice with network-aware (DLMP-style) prices | ✅ done |
 | **M3** | Replace clairvoyant best responses with learning agents on private data only — is the equilibrium still reachable? | ✅ done |
-| **M4** | Measure location-(un)fairness of efficient network pricing; test Shapley-based cost allocation as repair and as bill explanation | ⏳ next |
+| **M4** | Measure location-(un)fairness of efficient network pricing; test Shapley-based cost allocation as repair and as bill explanation | ✅ done |
 
 ## M3 — learning the equilibrium
 
@@ -43,6 +43,35 @@ integral control on a slower timescale. Findings, multi-seed and AC-PF audited:
   yet cross the voltage limit on 311 of 400 audited rounds — maximal static
   efficiency and robustness-to-learning are in direct tension (named as the
   open thesis-grade question).
+
+## M4 — the fairness ledger and Shapley attribution
+
+The FATE/XAI capstone, at the γ=1.1 network-priced equilibrium: the congested
+branch (23 of 96 households) surrenders **28.7% of its budget** in congestion
+charges while the rest pays ~5%. Findings:
+
+- **The charges pass a Shapley cost-causation audit.** Monte-Carlo Shapley
+  attribution of the constraint pressure (shadow-price-weighted voltage
+  depression, ~10⁴ AC power flows, MC stderr ~0.3%) matches the DLMP-lite
+  payment shares to within 0.1 percentage points — on a near-linear feeder,
+  marginal charging ≈ axiomatic responsibility. The split is certified; the
+  policy question (cost-causation = location discrimination when "causing"
+  means living on the weak branch) is thereby sharpened, not settled.
+- **Shapley doubles as the per-household bill explanation** — charge vs
+  audited responsibility ± sampling error, per household: a concrete XAI
+  artifact in the EU-AI-Act transparency sense.
+- **Two of three repairs fail — and the failures are caught, not assumed
+  away.** Rebating the congestion revenue into budgets *worsens* fairness
+  (Jain 0.983 → 0.970, +31% rebound: in a sell-all market rebates are price
+  inflation, and the branch's rebate re-excites its own constraint). An equal
+  dividend fails even as outside money (it targets the *small*; the congested
+  branch hosts the *large* consumers). What repairs the ledger is the
+  FTR-style pro-rata rebate — each household's own congestion payment returned
+  infra-marginally: Jain ≈ 1, zero rebound, physics untouched, caveats stated.
+- **The learning tax is location-biased too:** the congested branch pays ~2×
+  the regret of the rest while learning (7.0% vs 3.4% of equilibrium
+  utility). The weak branch pays three times: charges, purchasing power,
+  regret.
 
 ## M2 — the game meets the feeder
 
@@ -101,6 +130,7 @@ parameters (their converged demands are inconsistent with total supply); Figs.
 | [`02_maharjan2013_recreation`](notebooks/02_maharjan2013_recreation.ipynb) | The faithful recreation: model extraction, verification, reproduction of the paper's figures, the distributed algorithm as an integral controller on excess demand, and the recreation scorecard |
 | [`03_the_game_meets_the_feeder`](notebooks/03_the_game_meets_the_feeder.ipynb) | M2: the same game on a real feeder — AC-PF audits of equilibria and transients, the DLMP-lite dual ascent (with its instructive failures), the hosting-capacity frontier, and the fairness teaser |
 | [`04_learning_the_equilibrium`](notebooks/04_learning_the_equilibrium.ipynb) | M3: model-free households — bandit learning to the exact SE, the cascade-tuning landscape, and the trajectory audits showing learning noise spend the voltage margin |
+| [`05_fairness_and_shapley`](notebooks/05_fairness_and_shapley.ipynb) | M4: the fairness ledger, Monte-Carlo Shapley attribution with power flows, the bill-explanation artifact, the backfiring repair and its fix, and the repo capstone |
 
 [`docs/model_extraction.md`](docs/model_extraction.md) holds the full equation
 extraction with notation mapped to power-engineering terms;

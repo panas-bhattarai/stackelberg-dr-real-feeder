@@ -197,3 +197,65 @@ such (±few % reading error). No result is quoted from the paper as ours.
   limit by construction, so learning noise crosses it on 311 of 400 audited
   rounds (worst 0.8748): static efficiency leaves zero margin for learning.
   Efficiency vs robustness-to-learning named as the open tension. §6.
+
+## M4 — Fairness ledger and Shapley attribution (notebook 05)
+
+### Scope decisions and assumptions
+- **[M4-A1]** Working point: the γ=1.1 network-aware equilibrium (M2 dual
+  ascent). Fairness variable: energy per unit of ORIGINAL budget, z_n = x_n/C_n
+  (uniform on a copperplate). Metrics: Jain index, Gini/Lorenz, group means
+  (congested branch = households with τ_n > 0.1 vs rest).
+- **[M4-A2]** Shapley characteristic function: v(S) = Σ_{b:λ_b>0} λ_b ·
+  [V_b(∅) − V_b(S)] — shadow-price-weighted voltage depression at the binding
+  buses, with coalition members consuming their equilibrium demands and
+  non-members zero. Monotone, v(∅)=0, non-additive through AC nonlinearity
+  (which is why Shapley rather than any marginal split). Monte-Carlo
+  permutation sampling (100 orderings × 96 incremental AC PFs ≈ 9600 PFs);
+  efficiency axiom exact per ordering by telescoping; per-household MC stderr
+  reported.
+- **[M4-A3]** Repair mechanism: congestion revenue R_τ rebated as an equal
+  per-household dividend added to budgets, then THE WHOLE EQUILIBRIUM
+  RE-SOLVED (dual ascent, warm-started) and re-audited — rebound effects
+  measured, not assumed away. Fairness of the repaired state judged against
+  original budgets.
+- **[M4-A4]** Learning tax: per-household running-mean regret (M3 learner,
+  8000 rounds, seed 0, frozen τ*) as % of equilibrium utility, joined to
+  feeder geography. Single seed — a methodological demonstration, not a
+  multi-seed claim.
+
+### Results (executed notebook 05 — exact numbers there)
+- **[M4-R1]** Ledger at γ=1.1: congestion payments are a measurable share of
+  congested-branch budgets while the rest of the feeder pays ~nothing; Jain
+  and Gini quantify moderate-but-structural inequality concentrated on one
+  branch. §1.
+- **[M4-R2]** **The DLMP-lite charges pass the Shapley cost-causation audit:**
+  payment shares ≈ responsibility shares (corr ≈ 1.00, deviations fractions
+  of a percentage point). Physical reason: near-linear feeder response at
+  these loadings ⇒ marginal ≈ average-marginal. Not scripted — discovered in
+  the M4 smoke test. The audit certifies the SPLIT while sharpening the real
+  policy question (cost-causation charges = location discrimination when
+  "causing" means living on the weak branch). §2–3.
+- **[M4-R3]** Shapley doubles as the per-household bill explanation (XAI):
+  charge vs audited responsibility ± MC stderr, per household. §3.
+- **[M4-R4]** **The in-budget dividend repair BACKFIRES** (negative result,
+  kept): rebating R_τ into budgets and re-solving gives Jain 0.9834 → 0.9702,
+  Gini 0.0588 → 0.0940, congested-branch z 0.873 → 0.840 (worse), congestion
+  revenue rebound +31%. Mechanisms: sell-all pins total energy (rebate = pure
+  price inflation, cf. M1's prices-linear-in-C result) and the branch's
+  re-stimulated demand re-excites its own constraint. Design rule extracted:
+  a fairness transfer must not re-excite the constraint that created the
+  unfairness. §4.
+- **[M4-R5]** **The equal dividend fails even as outside money** (second
+  negative result): Jain 0.9834 → 0.9698, branch/rest ratio worsens — an
+  equal-per-household transfer targets the SMALL, but the congested branch
+  hosts the LARGE consumers. Mistargeting, caught by measurement. The scheme
+  that repairs the ledger: pro-rata outside-money rebate (each household's own
+  congestion payment returned — FTR logic: charge at the margin, rebate
+  infra-marginally): Jain ≈ 1, branch made whole, zero rebound, physics
+  untouched. Caveats stated: anticipated rebates would erode the marginal
+  signal in repeated play (flagged, not solved); compensation ≠ correction
+  (no more energy for the branch at fixed ΣP). §4.
+- **[M4-R6]** Learning tax by location (single seed, methodological demo): the
+  congested branch pays ~2× the learning tax of the rest (7.0% vs 3.4% of
+  equilibrium utility) — the branch pays three times: congestion charges,
+  purchasing power, regret. §5.

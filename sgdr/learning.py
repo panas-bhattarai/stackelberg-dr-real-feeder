@@ -61,7 +61,8 @@ class LearningResult:
     x_total: np.ndarray         # [T, N] per-household played demand (MW)
     price_err: np.ndarray       # [T] max_k |y - y*| if y_ref given else nan
     demand_err: np.ndarray      # [T] mean_n |x_n,tot - x*_n,tot|
-    regret: np.ndarray          # [T] mean_n cumulative (U_BR - U_played)/t
+    regret: np.ndarray          # [T] mean_n running-mean per-round regret
+    regret_n: np.ndarray        # [T, N] running-mean per-round regret per household
     seed: int
 
 
@@ -94,8 +95,8 @@ def run_coupled(game: Game, n_rounds: int, seed: int = 0,
     accum_count = 0
 
     logs = {k: [] for k in ("rounds", "y", "x_total", "price_err",
-                            "demand_err", "regret")}
-    cum_regret = 0.0
+                            "demand_err", "regret", "regret_n")}
+    cum_regret_n = np.zeros(N)
 
     def utility(xrow):
         return game.alpha * np.log(game.beta[:, None] + xrow).sum(axis=1)
@@ -138,15 +139,18 @@ def run_coupled(game: Game, n_rounds: int, seed: int = 0,
                 if x_ref is not None else np.nan)
             # regret vs clairvoyant best response at CURRENT prices
             xbr_now = _best_response_tau(game, y, tau)
-            cum_regret += float((utility(xbr_now) - utility(played)).mean())
-            logs["regret"].append(cum_regret / len(logs["rounds"]))
+            cum_regret_n += utility(xbr_now) - utility(played)
+            k_logs = len(logs["rounds"])
+            logs["regret_n"].append(cum_regret_n / k_logs)
+            logs["regret"].append(float(cum_regret_n.mean()) / k_logs)
 
     return LearningResult(
         rounds=np.array(logs["rounds"]), y=np.array(logs["y"]),
         x_total=np.array(logs["x_total"]),
         price_err=np.array(logs["price_err"]),
         demand_err=np.array(logs["demand_err"]),
-        regret=np.array(logs["regret"]), seed=seed)
+        regret=np.array(logs["regret"]),
+        regret_n=np.array(logs["regret_n"]), seed=seed)
 
 
 def _best_response_tau(game: Game, y: np.ndarray, tau: np.ndarray) -> np.ndarray:
