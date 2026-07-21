@@ -201,3 +201,8 @@ the answer safe, explainable, and fair.
 MIT (code and notebooks) — see [`LICENSE`](LICENSE). The recreated paper remains
 © IEEE / its authors; this repository contains no text or figures from it, only
 an independent implementation of its published equations.
+
+## AI-assisted development
+
+This work was carried out with substantial assistance from an AI coding assistant,
+under the direction and review of the author.
