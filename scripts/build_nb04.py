@@ -87,8 +87,8 @@ inverter — wiggle, feel, follow the gradient of an unmeasurable curve.
 learning finds the game's equilibrium*, and the cleanest instrument that isolates
 it is the simplest model-free learner with known guarantees for convex problems.
 Deep RL would add machinery this question does not need (a deliberate scoping
-decision — LEDGER M3-A1; the group's own distributed-DRL line is where this
-connects at PhD scale).
+decision — LEDGER M3-A1; distributed deep RL is the natural next step at
+full scale).
 
 **The UCs stay themselves.** Leaders keep M1's Algorithm-2 integral control —
 but naturally slower: one price update per $T_{uc}$ rounds, driven by the *mean*
@@ -245,7 +245,7 @@ $(T_{uc}=1, σ=5)$ climbs — aggressive leaders react to every exploration wigg
 and inject their own price noise, which the learners then chase in turn. The
 working middle $(T_{uc}=10, σ=40)$ is the cascade-control rule of thumb made
 quantitative: **the outer loop must be slow enough to see the inner loop's
-average, fast enough to still steer it.** For the PhD-scale program this is the
+average, fast enough to still steer it.** At full scale this is the
 first appearance of a deep theme: in multi-agent learning, *who updates when* is
 a design variable as important as *what anyone learns* — the paper's own
 Theorem 5 (sequential updates) was already whispering this.""")
@@ -302,8 +302,7 @@ constraint — and efficient market outcomes sit close to constraints *by design
 routinely even after "converging." Any deployment story for learning agents in
 distribution grids needs margin policies, trajectory audits, or constraint-aware
 learning — not just equilibrium certificates. This is the M3 finding that speaks
-directly to the safe-AI-for-critical-infrastructure language of the aiD
-programme.""")
+directly to safe-AI-for-critical-infrastructure requirements.""")
 
 # ======================================================================
 md(r"""## §6 · Learning under network-aware prices
@@ -354,7 +353,7 @@ rounds (Fig. 22b) — more than in §5, because DLMP-style efficiency deliberate
 spends all the margin. A static price vector cannot both extract maximum hosting
 capacity *and* absorb learning noise; something must give — margin in the
 prices, adaptivity in the adders, or constraint-awareness in the learners. That
-tension (efficiency vs. robustness-to-learning) is a thesis-grade question, and
+tension (efficiency vs. robustness-to-learning) is an open research question, and
 this notebook only *names* it — deliberately.
 
 ## §7 · Milestone 3 scorecard

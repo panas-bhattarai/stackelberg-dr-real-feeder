@@ -127,7 +127,7 @@ slower timescale. Multi-seed, AC-PF audited:
 - **DLMP-lite prices steer learners correctly but leave zero margin:** under
   frozen network-aware adders the learners find the repriced equilibrium yet
   cross the limit on 311 of 400 rounds — static efficiency and
-  robustness-to-learning are in direct tension (open thesis-grade question).
+  robustness-to-learning are in direct tension (open research question).
 
 ## M4 — the fairness ledger and Shapley attribution
 

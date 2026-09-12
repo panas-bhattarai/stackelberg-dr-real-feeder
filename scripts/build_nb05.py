@@ -22,8 +22,8 @@ used here three ways:
 1. as an **audit** — do the DLMP-lite charges match each household's true
    *responsibility* for the congestion? (§2–3)
 2. as an **explanation** — a per-household, axiomatically grounded decomposition
-   of the bill: this is the XAI deliverable, in the exact sense the aiD/FATE
-   agenda uses the word (§3)
+   of the bill: this is the XAI deliverable, in the sense used in the fairness, accountability,
+   transparency and ethics (FATE) literature (§3)
 3. as a **repair** — redistribute the congestion revenue and *honestly re-solve
    the whole equilibrium*, rebound effects included (§4)
 
@@ -408,10 +408,10 @@ learners against the analytical equilibrium, the fairness repair against the
 re-solved world. Nothing rests on a simulation nobody checked.
 
 **Open questions this prototype deliberately leaves on the table** (the
-PhD-scale agenda): adaptive congestion pricing *against* learning agents (the
+research agenda beyond this prototype): adaptive congestion pricing *against* learning agents (the
 efficiency-vs-robustness tension of nb 04 §6); constraint-aware or safe
-learning; multi-period coupling, storage, and DER; P2P/coalition markets in the
-virtual-microgrid line; formal FATE metrics beyond Jain/Gini/Shapley; and
+learning; multi-period coupling, storage, and DER; P2P/coalition markets in
+virtual microgrids; formal FATE metrics beyond Jain/Gini/Shapley; and
 mechanism design under the EU AI Act's transparency obligations, for which the
 Shapley bill explanation of §3 is a concrete starting artifact.""")
 
